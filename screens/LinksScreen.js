@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Alert } from 'react-native';
-import { Constants, BarCodeScanner, Permissions } from 'expo';
+import { Text, View, StyleSheet, Alert, Dimensions, Linking } from 'react-native';
+import { Constants, BarCodeScanner, Permissions, CameraFillMode } from 'expo';
 
 export default class LinksScreen extends Component {
+    static navigationOptions = {
+        header: null,
+    };
     state = {
         hasCameraPermission: null
     };
@@ -19,13 +22,15 @@ export default class LinksScreen extends Component {
     };
 
     _handleBarCodeRead = data => {
-        Alert.alert(
-            'Scan successful!',
-            JSON.stringify(data)
-        );
+        //Alert.alert(
+        //    'Scan successful!',
+        //    JSON.stringify(data)
+        //);
+        console.log(data.data);
+        Linking.openURL(data.data);
     };
-
     render() {
+        const { width, height } = Dimensions.get('window');
         return (
             <View style={styles.container}>
                 {this.state.hasCameraPermission === null ?
@@ -34,7 +39,9 @@ export default class LinksScreen extends Component {
                         <Text>Camera permission is not granted</Text> :
                         <BarCodeScanner
                             onBarCodeRead={this._handleBarCodeRead}
-                            style={{ height: 200, width: 200 }}
+                            style={{ width, height }}
+                            onException={this.handleException}
+                            cameraFillMode={"fit"}
                         />
                 }
             </View>
@@ -47,7 +54,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: Constants.statusBarHeight,
         backgroundColor: '#ecf0f1',
     }
 });
